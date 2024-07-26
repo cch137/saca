@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Saca",
+  "version": "1.0.0",
+  "icons": {
+    "64": "public/icon64.png",
+    "128": "public/icon128.png"
+  },
+  "action": {
+    "default_popup": "index.html"
+  },
+  "background": {
+    "type": "module",
+    "service_worker": "dist/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "permissions": ["scripting", "activeTab"],
+  "hosts_permissions": ["http://*/*", "https://*/*"]
+}
