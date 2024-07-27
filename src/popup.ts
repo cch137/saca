@@ -4,6 +4,6 @@ document.getElementById("saca")?.addEventListener("click", async (ev) => {
     func: () => {
       alert("Hi, I am cch137!");
     },
-    target: { tabId: tab.id },
+    target: { tabId: tab.id! },
   });
 });

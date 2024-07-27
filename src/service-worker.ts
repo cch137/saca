@@ -1,12 +1,9 @@
-chrome.tabs.onActivated.addListener(async (activeInfo) => {
-  const { tabId } = activeInfo;
-  const tab = await chrome.tabs.get(tabId);
+chrome.action.onClicked.addListener(async (tab) => {
+  const { id } = tab;
   chrome.scripting.executeScript({
-    target: { tabId },
+    target: { tabId: id! },
     func: async () => {
-      alert("active!");
+      console.log("active!");
     },
   });
 });
-
-export {};

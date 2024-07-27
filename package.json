@@ -25,10 +25,14 @@
   "contributors": [],
   "scripts": {
     "dev": "tsc",
-    "test": "tsc -w"
+    "test": "webpack --watch",
+    "build": "webpack"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.269",
-    "typescript": "^5.5.4"
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.5.4",
+    "webpack": "^5.93.0",
+    "webpack-cli": "^5.1.4"
   }
 }
