@@ -97,7 +97,7 @@ export default (() => {
     // Convert PPT to PDF
     const pptContainer = query("#pptContainer");
     if (!pptContainer) return;
-    const apiOrigin = "https://api.cch137.link";
+    const apiOrigin = "https://api.cch137.com";
     const buttonText = "Convert to PDF";
     const buttonLoadingText = "Converting to PDF...";
     pptContainer.parentNode!.appendChild(
