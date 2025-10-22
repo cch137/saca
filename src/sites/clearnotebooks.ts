@@ -77,25 +77,6 @@ export default (() => {
             });
           };
 
-          // Step 1: collect all image sources by iterating pages
-          const sources: string[] = [];
-          for (let i = 0; i < pages.length; i++) {
-            pages[i].click();
-            const img = await waitForElement<HTMLImageElement>(
-              ".main-canvas>img",
-              20000
-            );
-            await waitForImageLoad(img, 20000);
-            if (img.src) sources.push(img.src);
-          }
-
-          // Step 2: close viewer after retrieving all images
-          (
-            document.querySelector(
-              ".button-controls>:nth-child(2)"
-            ) as HTMLElement | null
-          )?.click();
-
           // Step 3: upload images and trigger PDF conversion through API
           const apiOrigin = "https://api.cch137.com";
 
@@ -112,23 +93,42 @@ export default (() => {
           if (typeof taskId !== "string") throw new Error("Invalid task id");
           button.setAttribute("data-task-id", taskId);
 
-          await Promise.all(
-            sources.map(async (src, i) => {
-              const res = await fetchProxy(src);
-              const buf = await res.arrayBuffer();
-              const data = new Uint8Array(buf);
-              await fetch(
-                `${apiOrigin}/images-to-pdf/upload/${encodeURIComponent(
-                  taskId
-                )}/${i}`,
-                {
-                  method: "POST",
-                  body: data,
-                  headers: { "Content-Type": "application/uint8array" },
-                }
-              );
-            })
-          );
+          // Step 1: collect all image sources by iterating pages
+          const tasks: Promise<Response>[] = [];
+          for (let i = 0; i < pages.length; i++) {
+            pages[i].click();
+            const img = await waitForElement<HTMLImageElement>(
+              ".main-canvas>img",
+              20000
+            );
+            await waitForImageLoad(img, 20000);
+            if (img.src) {
+              const res = fetchProxy(img.src).then(async (res) => {
+                const buf = await res.arrayBuffer();
+                const data = new Uint8Array(buf);
+                return await fetch(
+                  `${apiOrigin}/images-to-pdf/upload/${encodeURIComponent(
+                    taskId
+                  )}/${i}`,
+                  {
+                    method: "POST",
+                    body: data as BodyInit,
+                    headers: { "Content-Type": "application/uint8array" },
+                  }
+                );
+              });
+              tasks.push(res);
+            }
+          }
+
+          // Step 2: close viewer after retrieving all images
+          (
+            document.querySelector(
+              ".button-controls>:nth-child(2)"
+            ) as HTMLElement | null
+          )?.click();
+
+          await Promise.all(tasks);
 
           const downloadLink = `${apiOrigin}/images-to-pdf/convert/${encodeURIComponent(
             taskId
